@@ -90,8 +90,6 @@ void Game::initialize() {
 	instance->rng = mt19937(seed);
 	instance->load_resources();
 
-	LOG_F(INFO, "hi");
-
 	// Setup Window
 	instance->video_mode = sf::VideoMode(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
 
@@ -102,14 +100,18 @@ void Game::initialize() {
 
 	// Debug Text	
 	instance->debug_text = { "", instance->fonts[PRESS_START_2P] };
-	instance->debug_text.setColor(sf::Color::White);
+	instance->debug_text.setFillColor(sf::Color::White);
+	instance->debug_text.setOutlineColor(sf::Color::Black);
+	instance->debug_text.setOutlineThickness(1.0f);
 
 	if (instance->debug_enabled)
 		LOG_F(INFO, "Debug enabled");
 
 	// Paused Text
 	instance->paused_text = { "PAUSED", instance->fonts[PRESS_START_2P] };
-	instance->paused_text.setColor(sf::Color::White);
+	instance->paused_text.setFillColor(sf::Color::White);
+	instance->paused_text.setOutlineColor(sf::Color::Black);
+	instance->paused_text.setOutlineThickness(1.0f);
 	instance->paused_text.setPosition({ (instance->window->getSize().x - 
 		instance->paused_text.getGlobalBounds().width) / 2, 50 });
 
@@ -135,10 +137,11 @@ string Game::rand_title() {
 
 void Game::load_resources() {
 	// Titles
+	LOG_F(INFO, "Loading titles...");
 	titles = load_text_file(TITLES_DATABASE_PATH);
-	LOG_F(INFO, "Loaded titles:");
 	for (string& title: titles)
-		LOG_F(INFO, "%s", title.data());
+		LOG_F(INFO, "Title: \"%s\"", title.data());
+	LOG_F(INFO, " ");
 
 	// Fonts
 	LOG_F(INFO, "Loading fonts...");
@@ -148,6 +151,7 @@ void Game::load_resources() {
 			exit(EXIT_FAILURE);
 		LOG_F(INFO, "Font: %s", FONTS[i].data());
 	}
+	LOG_F(INFO, " ");
 
 	// Load textures
 	LOG_F(INFO, "Loading textures...");
@@ -157,24 +161,26 @@ void Game::load_resources() {
 			exit(EXIT_FAILURE);
 		LOG_F(INFO, "Texture: %s", TEXTURES[i].data());
 	}
+	LOG_F(INFO, " ");
 
 	// Load music files
 	LOG_F(INFO, "Loading music files...");
 	for (uint8_t i = 0; i < music.size(); ++i) {
-		// sf::Music root;
-		// if (!root.openFromFile(MUSIC_PATH_BASE + "/" + MUSIC[i]))
-		// 	exit(EXIT_FAILURE);
-		// music[i] = &root;
-		// LOG_F(INFO, "Music: %s", MUSIC[i].data());
+		music[i] = unique_ptr<sf::Music>(new sf::Music());
+		if (!music[i]->openFromFile(MUSIC_PATH_BASE + "/" + MUSIC[i]))
+			exit(EXIT_FAILURE);
+		LOG_F(INFO, "Music: %s", MUSIC[i].data());
 	}
+	LOG_F(INFO, " ");
 
+	// Load sound files
 	LOG_F(INFO, "Loading sound files...");
 	for (uint8_t i = 0; i < sounds.size(); ++i) {
-		// sf::SoundBuffer buffer;
-		// if (!buffer.loadFromFile(SOUND_PATH_BASE + "/" + SOUNDS[i]))
-		// 	exit(EXIT_FAILURE);
-		// sf::Sound sound(buffer);
-		// sounds[i] = &sound;
-		// LOG_F(INFO, "Sound: %s", SOUNDS[i].data());
+		sf::SoundBuffer buffer;
+		if (!buffer.loadFromFile(SOUND_PATH_BASE + "/" + SOUNDS[i]))
+			exit(EXIT_FAILURE);
+		sounds[i] = unique_ptr<sf::Sound>(new sf::Sound(buffer));
+		LOG_F(INFO, "Sound: %s", SOUNDS[i].data());
 	}
+	LOG_F(INFO, " ");
 }
