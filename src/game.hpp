@@ -38,8 +38,8 @@ public:
 	/*
 	 * ASSETS
 	 */
-	array<sf::Music*, NUM_MUSIC> 	  	music;
-	array<sf::Sound*, NUM_SOUNDS>		sounds;
+	array<unique_ptr<sf::Music>, NUM_MUSIC>  music;
+	array<unique_ptr<sf::Sound>, NUM_SOUNDS> sounds;
 	array<sf::Texture, NUM_TEXTURES>  	textures;
 	array<sf::Font, NUM_FONTS> 			fonts;
 
